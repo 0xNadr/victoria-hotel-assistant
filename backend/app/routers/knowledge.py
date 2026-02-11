@@ -23,8 +23,14 @@ class KnowledgeResponse(BaseModel):
     query: str
 
 
-# Initialize knowledge base service
-kb_service = KnowledgeBaseService()
+# Lazy-load knowledge base service to avoid blocking app startup
+_kb_service = None
+
+def get_kb_service():
+    global _kb_service
+    if _kb_service is None:
+        _kb_service = KnowledgeBaseService()
+    return _kb_service
 
 
 @router.post("/query", response_model=KnowledgeResponse)
@@ -34,7 +40,7 @@ async def query_knowledge(query_data: KnowledgeQuery):
     This endpoint is called by the ElevenLabs agent as a tool.
     """
     try:
-        results = kb_service.query(
+        results = get_kb_service().query(
             query=query_data.query,
             hotel_id=query_data.hotel_id,
             n_results=query_data.n_results,
@@ -59,7 +65,7 @@ async def query_knowledge(query_data: KnowledgeQuery):
 async def knowledge_health():
     """Check if knowledge base is initialized and healthy."""
     try:
-        status = kb_service.get_status()
+        status = get_kb_service().get_status()
         return {"status": "healthy", **status}
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
