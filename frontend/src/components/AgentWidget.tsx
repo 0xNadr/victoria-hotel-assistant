@@ -15,7 +15,8 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
   const [isMuted, setIsMuted] = useState(false)
   const [status, setStatus] = useState<string>('Ready to call')
   const [agentStatus, setAgentStatus] = useState<'listening' | 'speaking' | 'idle'>('idle')
-  const [transcript, setTranscript] = useState<Array<{ role: string; text: string }>>([])
+  const [transcript, setTranscript] = useState<Array<{ role: string; text: string; isTentative?: boolean }>>([])
+  const [tentativeUserText, setTentativeUserText] = useState<string | null>(null)
   const conversationRef = useRef<any>(null)
   const transcriptRef = useRef<HTMLDivElement>(null)
 
@@ -45,6 +46,10 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
         onMessage: (message) => {
           const msg = message as any
           if (msg.message) {
+            // Clear tentative text when final user message arrives
+            if (msg.source === 'user') {
+              setTentativeUserText(null)
+            }
             setTranscript(prev => [...prev, {
               role: msg.source === 'user' ? 'user' : 'agent',
               text: msg.message
@@ -53,6 +58,20 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
         },
         onModeChange: (mode) => {
           setAgentStatus(mode.mode === 'speaking' ? 'speaking' : 'listening')
+          // Clear tentative text when agent starts speaking
+          if (mode.mode === 'speaking') {
+            setTentativeUserText(null)
+          }
+        },
+        onDebug: (debugEvent) => {
+          // Capture tentative user transcriptions for immediate display
+          const event = debugEvent as any
+          if (event?.type === 'tentative_user_transcript') {
+            const text = event?.tentative_user_transcription_event?.user_transcript
+            if (text) {
+              setTentativeUserText(text)
+            }
+          }
         },
         onError: (error) => {
           console.error('Conversation error:', error)
@@ -95,7 +114,7 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
     if (transcriptRef.current) {
       transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight
     }
-  }, [transcript])
+  }, [transcript, tentativeUserText])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -159,7 +178,7 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
           ref={transcriptRef}
           className="flex-1 bg-gradient-to-b from-gray-50 to-gray-100/50 rounded-lg sm:rounded-xl p-3 sm:p-4 min-h-[200px] sm:min-h-[250px] max-h-[280px] sm:max-h-[350px] overflow-y-auto border border-gray-100"
         >
-          {transcript.length === 0 ? (
+          {transcript.length === 0 && !tentativeUserText ? (
             <div className="h-full flex flex-col items-center justify-center text-center px-2 sm:px-4">
               <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-5 ${
                 isCallActive
@@ -219,6 +238,17 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
                   </div>
                 </div>
               ))}
+              {/* Show tentative user input as they speak */}
+              {tentativeUserText && (
+                <div className="flex gap-2 sm:gap-3 flex-row-reverse">
+                  <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg flex items-center justify-center bg-blue-100">
+                    <User className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                  </div>
+                  <div className="max-w-[80%] sm:max-w-[75%] rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm shadow-sm bg-blue-400 text-white rounded-tr-sm sm:rounded-tr-md opacity-70 italic">
+                    {tentativeUserText}...
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
