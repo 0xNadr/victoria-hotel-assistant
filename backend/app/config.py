@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     # ChromaDB
     chroma_persist_dir: str = "./chroma_data"
 
+    # Sample data seeding
+    seed_sample_calls: bool = False
+    seed_sample_calls_count: int = 25
+    seed_sample_calls_only_if_empty: bool = True
+
     # ElevenLabs
     elevenlabs_api_key: str = ""
     elevenlabs_agent_id: str = ""

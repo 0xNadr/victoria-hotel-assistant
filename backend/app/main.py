@@ -69,11 +69,32 @@ def seed_knowledge_base():
         print(f"Warning: Failed to seed knowledge base: {e}")
 
 
+def seed_sample_calls_if_enabled():
+    """Optionally seed sample call data on startup."""
+    if not settings.seed_sample_calls:
+        return
+
+    try:
+        from scripts.seed_sample_calls import create_sample_calls
+
+        print("Seeding sample call data...")
+        create_sample_calls(
+            num_calls=settings.seed_sample_calls_count,
+            clear_existing=False,
+            only_if_empty=settings.seed_sample_calls_only_if_empty,
+        )
+    except Exception as e:
+        print(f"Warning: Failed to seed sample calls: {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
     # Initialize database tables on startup
     init_db()
+
+    # Seed sample calls (optional)
+    seed_sample_calls_if_enabled()
 
     # Seed knowledge base (runs in background to not block startup)
     print("Seeding knowledge base...")

@@ -70,16 +70,27 @@ Viktoria: You're welcome! Let me know if you have any other questions.""",
 ]
 
 
-def create_sample_calls(num_calls: int = 25):
+def create_sample_calls(
+    num_calls: int = 25,
+    clear_existing: bool = True,
+    only_if_empty: bool = False,
+):
     """Create sample call records."""
     init_db()
     db = SessionLocal()
 
     try:
-        # Clear existing data
-        db.query(Feedback).delete()
-        db.query(Call).delete()
-        db.commit()
+        if only_if_empty:
+            existing_count = db.query(Call).count()
+            if existing_count > 0:
+                print(f"Sample calls not seeded: {existing_count} calls already exist")
+                return
+
+        if clear_existing:
+            # Clear existing data
+            db.query(Feedback).delete()
+            db.query(Call).delete()
+            db.commit()
 
         calls_created = []
 
