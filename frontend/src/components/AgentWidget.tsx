@@ -22,17 +22,12 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
 
   const startConversation = useCallback(async () => {
     try {
-      setStatus('Requesting microphone...')
-
-      // Request microphone access
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-
       setStatus('Connecting to Viktoria...')
       setTranscript([])
 
       const conversation = await Conversation.startSession({
         agentId: agentId,
-        connectionType: 'websocket',
+        connectionType: 'webrtc',
         onConnect: () => {
           setStatus('Connected')
           setIsCallActive(true)
