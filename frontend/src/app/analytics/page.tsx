@@ -154,7 +154,7 @@ export default function AnalyticsPage() {
               <div className="min-w-0">
                 <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">Avg Duration</p>
                 <p className="text-xl sm:text-3xl font-bold text-gray-900 tabular-nums">
-                  {metrics?.average_duration_seconds
+                  {metrics?.average_duration_seconds != null
                     ? `${Math.floor(metrics.average_duration_seconds / 60)}:${String(Math.floor(metrics.average_duration_seconds % 60)).padStart(2, '0')}`
                     : '-'}
                 </p>
