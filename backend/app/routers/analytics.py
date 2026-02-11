@@ -71,7 +71,7 @@ def get_summary_metrics(
         total_calls=total_calls,
         completed_calls=completed_calls,
         dropped_calls=dropped_calls,
-        average_duration_seconds=round(avg_duration, 1) if avg_duration else None,
+        average_duration_seconds=round(avg_duration) if avg_duration else None,
         average_rating=round(avg_rating, 2) if avg_rating else None,
         total_ratings=total_ratings,
         calls_with_feedback=calls_with_feedback,
