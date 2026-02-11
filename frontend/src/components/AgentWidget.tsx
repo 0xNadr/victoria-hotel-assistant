@@ -31,6 +31,7 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
 
       const conversation = await Conversation.startSession({
         agentId: agentId,
+        connectionType: 'websocket',
         onConnect: () => {
           setStatus('Connected')
           setIsCallActive(true)
