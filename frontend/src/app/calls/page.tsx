@@ -1,13 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { RatingStars } from '@/components/RatingStars'
 import { getCalls } from '@/lib/api'
 import { formatDuration, formatDateTime } from '@/lib/utils'
-import type { Call, CallListResponse } from '@/types'
+import type { CallListResponse } from '@/types'
 import { ChevronLeft, ChevronRight, Phone, Filter, Inbox, ArrowUpRight } from 'lucide-react'
 
 export default function CallsPage() {
@@ -32,16 +31,16 @@ export default function CallsPage() {
   }, [page, status])
 
   return (
-    <div className="p-8 page-content">
+    <div className="p-4 sm:p-6 lg:p-8 page-content">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-dormero-red to-red-700">
-            <Phone className="h-5 w-5 text-white" />
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-dormero-red to-red-700">
+            <Phone className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Call Logs</h1>
-            <p className="text-gray-500 text-sm">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Call Logs</h1>
+            <p className="text-gray-500 text-xs sm:text-sm">
               Review and rate customer conversations
             </p>
           </div>
@@ -49,46 +48,45 @@ export default function CallsPage() {
       </div>
 
       <Card className="overflow-hidden">
-        <CardHeader className="flex flex-row items-center justify-between bg-gray-50/50">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 bg-gray-50/50 px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center gap-3">
-            <CardTitle>All Calls</CardTitle>
+            <CardTitle className="text-base sm:text-lg">All Calls</CardTitle>
             {data && (
-              <span className="px-2.5 py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-600">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-gray-100 text-xs font-medium text-gray-600">
                 {data.total} total
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-gray-400" />
-              <select
-                value={status}
-                onChange={(e) => {
-                  setStatus(e.target.value)
-                  setPage(1)
-                }}
-                className="text-sm bg-white border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-dormero-red/20 focus:border-dormero-red cursor-pointer font-medium text-gray-700"
-              >
-                <option value="">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="dropped">Dropped</option>
-                <option value="in_progress">In Progress</option>
-              </select>
-            </div>
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-gray-400" />
+            <select
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value)
+                setPage(1)
+              }}
+              className="text-sm bg-white border border-gray-200 rounded-lg sm:rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-dormero-red/20 focus:border-dormero-red cursor-pointer font-medium text-gray-700 w-full sm:w-auto"
+            >
+              <option value="">All Status</option>
+              <option value="completed">Completed</option>
+              <option value="dropped">Dropped</option>
+              <option value="in_progress">In Progress</option>
+            </select>
           </div>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-16">
+            <div className="flex flex-col items-center justify-center py-12 sm:py-16">
               <div className="relative">
-                <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-200" />
-                <div className="absolute inset-0 animate-spin rounded-full h-10 w-10 border-4 border-dormero-red border-t-transparent" />
+                <div className="animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-gray-200" />
+                <div className="absolute inset-0 animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-dormero-red border-t-transparent" />
               </div>
               <p className="text-sm text-gray-500 mt-4 animate-pulse">Loading calls...</p>
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
+              {/* Desktop Table - hidden on mobile */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50/80 border-b border-gray-100">
                     <tr>
@@ -113,7 +111,7 @@ export default function CallsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {data?.calls.map((call, index) => (
+                    {data?.calls.map((call) => (
                       <tr
                         key={call.id}
                         className="hover:bg-blue-50/50 cursor-pointer group"
@@ -190,15 +188,90 @@ export default function CallsPage() {
                 </table>
               </div>
 
+              {/* Mobile Card List - hidden on desktop */}
+              <div className="md:hidden divide-y divide-gray-100">
+                {data?.calls.map((call) => (
+                  <div
+                    key={call.id}
+                    className="p-4 hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
+                    onClick={() => window.location.href = `/calls/${call.id}`}
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatDateTime(call.started_at)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500 truncate">
+                          {call.caller_id ?? 'Unknown caller'}
+                        </p>
+                      </div>
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0 ${
+                          call.status === 'completed'
+                            ? 'bg-green-100 text-green-700'
+                            : call.status === 'dropped'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        <span className={`h-1.5 w-1.5 rounded-full ${
+                          call.status === 'completed'
+                            ? 'bg-green-500'
+                            : call.status === 'dropped'
+                            ? 'bg-red-500'
+                            : 'bg-yellow-500'
+                        }`} />
+                        {call.status}
+                      </span>
+                    </div>
+                    {call.summary && (
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                        {call.summary}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500 tabular-nums">
+                        {formatDuration(call.duration_seconds)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {call.feedback ? (
+                          <RatingStars rating={call.feedback.rating} size="sm" />
+                        ) : (
+                          <span className="text-xs text-dormero-red font-medium">Rate call</span>
+                        )}
+                        <ChevronRight className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {data?.calls.length === 0 && (
+                  <div className="px-4 py-12 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="h-14 w-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+                        <Inbox className="h-7 w-7 text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-gray-700 font-medium">No calls found</p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          {status ? 'Try adjusting your filter' : 'Calls will appear here once recorded'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Pagination */}
               {data && data.total_pages > 1 && (
-                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/30">
-                  <p className="text-sm text-gray-500">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50/30">
+                  <p className="text-xs sm:text-sm text-gray-500 order-2 sm:order-1">
                     Showing <span className="font-medium text-gray-700">{(page - 1) * data.page_size + 1}</span> to{' '}
                     <span className="font-medium text-gray-700">{Math.min(page * data.page_size, data.total)}</span> of{' '}
                     <span className="font-medium text-gray-700">{data.total}</span> calls
                   </p>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 order-1 sm:order-2">
                     <Button
                       variant="secondary"
                       size="sm"
@@ -207,19 +280,21 @@ export default function CallsPage() {
                       className="gap-1"
                     >
                       <ChevronLeft className="h-4 w-4" />
-                      Previous
+                      <span className="hidden sm:inline">Previous</span>
                     </Button>
-                    <div className="flex items-center gap-1 px-3">
-                      {Array.from({ length: Math.min(5, data.total_pages) }, (_, i) => {
+                    <div className="flex items-center gap-1">
+                      {/* Show fewer page numbers on mobile */}
+                      {Array.from({ length: Math.min(window?.innerWidth < 640 ? 3 : 5, data.total_pages) }, (_, i) => {
                         let pageNum
-                        if (data.total_pages <= 5) {
+                        const maxPages = typeof window !== 'undefined' && window.innerWidth < 640 ? 3 : 5
+                        if (data.total_pages <= maxPages) {
                           pageNum = i + 1
-                        } else if (page <= 3) {
+                        } else if (page <= Math.ceil(maxPages / 2)) {
                           pageNum = i + 1
-                        } else if (page >= data.total_pages - 2) {
-                          pageNum = data.total_pages - 4 + i
+                        } else if (page >= data.total_pages - Math.floor(maxPages / 2)) {
+                          pageNum = data.total_pages - maxPages + 1 + i
                         } else {
-                          pageNum = page - 2 + i
+                          pageNum = page - Math.floor(maxPages / 2) + i
                         }
                         return (
                           <button
@@ -243,7 +318,7 @@ export default function CallsPage() {
                       disabled={page === data.total_pages}
                       className="gap-1"
                     >
-                      Next
+                      <span className="hidden sm:inline">Next</span>
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>

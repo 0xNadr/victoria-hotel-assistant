@@ -135,3 +135,69 @@ a {
 input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 3px rgba(196, 18, 48, 0.1);
 }
+
+/* Mobile sidebar slide-in animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.25s ease-out;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 1023px) {
+  /* Reduce padding on mobile */
+  .page-content {
+    padding: 1rem !important;
+  }
+
+  /* Better touch targets on mobile */
+  button, a {
+    min-height: 44px;
+  }
+
+  /* Disable hover lift on touch devices */
+  button:not(:disabled):hover {
+    transform: none;
+  }
+
+  /* Smaller scrollbar on mobile */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-top)) {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Hide scrollbar on mobile for cleaner look */
+@media (max-width: 640px) {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Mobile card responsive */
+@media (max-width: 640px) {
+  .card-animate {
+    animation-delay: 0ms !important;
+  }
+}
