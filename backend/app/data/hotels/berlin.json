@@ -1,0 +1,108 @@
+{
+  "hotel_id": "berlin",
+  "hotel_name": "DORMERO Hotel Berlin Ku'damm",
+  "brand": "DORMERO Hotels",
+  "source": "https://www.dormero.de/en/hotel-berlin-kudamm/",
+  "documents": [
+    {
+      "id": "berlin-overview",
+      "category": "overview",
+      "content": "DORMERO Hotel Berlin Ku'damm is a boutique hotel with 72 rooms across three categories, located in Berlin's Charlottenburg district. The hotel represents a balance between classical and modern design, offering individuality and minimalist style. The hotel is part of DORMERO Hotels, a group with over 60 properties across Germany, Austria, Switzerland, Hungary, Spain, and Sri Lanka."
+    },
+    {
+      "id": "berlin-location",
+      "category": "location",
+      "content": "DORMERO Hotel Berlin Ku'damm is located at Eislebener Straße 14, 10789 Berlin, Germany. The hotel is just a few meters from the famous Kurfürstendamm boulevard, Berlin's premier shopping and entertainment district in Charlottenburg-Wilmersdorf. The Kaiser Wilhelm Memorial Church is nearby."
+    },
+    {
+      "id": "berlin-directions",
+      "category": "location",
+      "content": "Driving directions to DORMERO Hotel Berlin Ku'damm: From the A111 interstate, take the exit 'Wilmersdorf' and then the exit 'Kurfürstendamm'. When you get to the Kaiser Wilhelm Memorial Church landmark, take a right turn into Rankestraße. After 200 meters, take a left turn into Eislebener Straße."
+    },
+    {
+      "id": "berlin-rooms-general",
+      "category": "rooms",
+      "content": "DORMERO Hotel Berlin Ku'damm has 72 rooms across three different categories. The rooms offer a perfect combination of design, individuality and minimalist style. All rooms feature exclusively developed DORMERO beds for optimal comfort, free WiFi, and a free minibar on arrival day."
+    },
+    {
+      "id": "berlin-suite",
+      "category": "rooms",
+      "content": "The DORMERO Suite at Berlin Ku'damm is 65 square meters and features a spacious living and sleeping area, an en suite dressing room, and not only a bathroom but also a separate makeup room. It's our most luxurious accommodation option."
+    },
+    {
+      "id": "berlin-parking",
+      "category": "amenities",
+      "content": "DORMERO Hotel Berlin Ku'damm offers 16 parking spaces in the underground parking garage. The daily parking rate is 25 EUR. Please note that it is not possible to reserve a parking space in advance - spaces are available on a first-come, first-served basis."
+    },
+    {
+      "id": "berlin-wifi",
+      "category": "amenities",
+      "content": "Free WiFi (WLAN) is available throughout the entire DORMERO Hotel Berlin Ku'damm. The use of the hotel WiFi is completely free of charge for all guests."
+    },
+    {
+      "id": "berlin-breakfast",
+      "category": "amenities",
+      "content": "DORMERO Hotel Berlin Ku'damm offers a varied breakfast buffet daily from 6:30 AM to 10:30 AM. Guests can add breakfast when booking online, by phone, or upon arrival at the hotel."
+    },
+    {
+      "id": "berlin-fitness",
+      "category": "amenities",
+      "content": "DORMERO Hotel Berlin Ku'damm has professional workout devices available for guests as part of its wellness and fitness amenities."
+    },
+    {
+      "id": "berlin-minibar",
+      "category": "amenities",
+      "content": "All rooms at DORMERO Hotel Berlin Ku'damm include a free minibar on arrival day. This is a complimentary amenity for all guests staying at the hotel."
+    },
+    {
+      "id": "berlin-beds",
+      "category": "amenities",
+      "content": "All rooms at DORMERO Hotels feature exclusively developed DORMERO beds, designed for optimal comfort and a great night's sleep."
+    },
+    {
+      "id": "berlin-checkin",
+      "category": "policies",
+      "content": "Check-in time at DORMERO Hotel Berlin Ku'damm is from 3:00 PM (15:00). Check-out time is by 12:00 PM (noon). The reception is staffed from 1:00 PM to 11:00 PM. The hotel offers easy check-in and fast check-out services."
+    },
+    {
+      "id": "berlin-pets",
+      "category": "policies",
+      "content": "DORMERO Hotels are pet-friendly! You can bring your favorite four-legged friend with you completely FREE of charge. Just mention when making your reservation that you'll be bringing a pet, and we'll make sure everything is ready for you both."
+    },
+    {
+      "id": "berlin-smoking",
+      "category": "policies",
+      "content": "DORMERO Hotel Berlin Ku'damm is a non-smoking hotel. All rooms and common areas are smoke-free to ensure a comfortable environment for all guests."
+    },
+    {
+      "id": "berlin-payment",
+      "category": "policies",
+      "content": "DORMERO Hotel Berlin Ku'damm accepts digital payments only. All major credit and debit cards are accepted. Please note that cash payments are not available."
+    },
+    {
+      "id": "berlin-citytax",
+      "category": "policies",
+      "content": "A Berlin city tax of 5% applies to overnight accommodations at DORMERO Hotel Berlin Ku'damm. Business travelers are exempt from this tax with appropriate documentation."
+    },
+    {
+      "id": "berlin-contact",
+      "category": "contact",
+      "content": "DORMERO Hotel Berlin Ku'damm contact information: Address: Eislebener Straße 14, 10789 Berlin, Germany. Phone: +49 30 202 13 300. Email: berlin@dormero.de. Central reservations: +49 30 20213300 (Monday-Friday 7am-7pm, Saturday-Sunday 10am-6pm) or reservierung@dormero.de."
+    },
+    {
+      "id": "berlin-rates",
+      "category": "booking",
+      "content": "DORMERO offers flexible rate options: The 'Smart Rate' offers flexibility with free cancellation. The 'Fancy Saver Rate' provides 15% savings with prepayment. Book directly on dormero.de for the best available rates."
+    },
+    {
+      "id": "general-brand",
+      "category": "general",
+      "content": "DORMERO Hotels is a hotel group with over 60 properties across Germany, Austria, Switzerland, Hungary, Spain, and Sri Lanka. The brand is known for combining classical and modern design, pet-friendly policies (pets stay FREE!), and consistent amenities including free WiFi, quality DORMERO beds, and breakfast buffets across all locations."
+    },
+    {
+      "id": "general-service",
+      "category": "general",
+      "content": "DORMERO Hotels prides itself on flexible and friendly service with 'flexible and sprightly' staff members. Most hotels have reception hours from 1 PM to 11 PM, while select cities including Frankfurt, Hanover, Stuttgart, and Vienna offer 24-hour reception service."
+    }
+  ]
+}
