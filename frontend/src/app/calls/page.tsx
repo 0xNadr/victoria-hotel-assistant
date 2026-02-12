@@ -16,18 +16,22 @@ export default function CallsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchCalls() {
-      setLoading(true)
+    async function fetchCalls(showLoading = true) {
+      if (showLoading) setLoading(true)
       try {
         const result = await getCalls(page, 15, status || undefined)
         setData(result)
       } catch (error) {
         console.error('Failed to fetch calls:', error)
       } finally {
-        setLoading(false)
+        if (showLoading) setLoading(false)
       }
     }
     fetchCalls()
+
+    // Auto-refresh every 10 seconds (silent, no loading spinner)
+    const interval = setInterval(() => fetchCalls(false), 10000)
+    return () => clearInterval(interval)
   }, [page, status])
 
   return (

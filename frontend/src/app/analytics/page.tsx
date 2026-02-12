@@ -33,8 +33,8 @@ export default function AnalyticsPage() {
   const [days, setDays] = useState(30)
 
   useEffect(() => {
-    async function fetchData() {
-      setLoading(true)
+    async function fetchData(showLoading = true) {
+      if (showLoading) setLoading(true)
       try {
         const [metricsData, volumeData, ratingsData] = await Promise.all([
           getSummaryMetrics(days),
@@ -47,10 +47,14 @@ export default function AnalyticsPage() {
       } catch (error) {
         console.error('Failed to fetch analytics:', error)
       } finally {
-        setLoading(false)
+        if (showLoading) setLoading(false)
       }
     }
     fetchData()
+
+    // Auto-refresh every 15 seconds (silent, no loading spinner)
+    const interval = setInterval(() => fetchData(false), 15000)
+    return () => clearInterval(interval)
   }, [days])
 
   if (loading) {

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Phone, PhoneOff, Mic, MicOff, Waves, Bot, User } from 'lucide-react'
 import { Conversation } from '@elevenlabs/client'
+import { createCall, updateCall } from '@/lib/api'
 
 interface AgentWidgetProps {
   agentId: string
@@ -19,21 +20,68 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
   const [tentativeUserText, setTentativeUserText] = useState<string | null>(null)
   const conversationRef = useRef<any>(null)
   const transcriptRef = useRef<HTMLDivElement>(null)
+  const callIdRef = useRef<string | null>(null)
+  const callStartTimeRef = useRef<Date | null>(null)
+  const userEndedCallRef = useRef(false)
+  const transcriptRef2 = useRef<Array<{ role: string; text: string }>>([])
+
+  // Keep transcript ref in sync for use in callbacks
+  useEffect(() => {
+    transcriptRef2.current = transcript
+  }, [transcript])
 
   const startConversation = useCallback(async () => {
     try {
       setStatus('Connecting...')
       setTranscript([])
+      userEndedCallRef.current = false
 
       const conversation = await Conversation.startSession({
         agentId: agentId,
         connectionType: 'webrtc',
-        onConnect: () => {
+        onConnect: async () => {
           setStatus('Connected')
           setIsCallActive(true)
           setAgentStatus('listening')
+
+          // Create call record in database
+          try {
+            callStartTimeRef.current = new Date()
+            const call = await createCall({
+              started_at: callStartTimeRef.current.toISOString(),
+              status: 'in_progress',
+              caller_id: 'web-test',
+            })
+            callIdRef.current = call.id
+          } catch (err) {
+            console.error('Failed to create call record:', err)
+          }
         },
-        onDisconnect: () => {
+        onDisconnect: async () => {
+          // If user didn't intentionally end, this is a dropped call
+          if (!userEndedCallRef.current && callIdRef.current && callStartTimeRef.current) {
+            try {
+              const endTime = new Date()
+              const durationSeconds = Math.round(
+                (endTime.getTime() - callStartTimeRef.current.getTime()) / 1000
+              )
+              const transcriptText = transcriptRef2.current
+                .map((msg) => `${msg.role === 'user' ? 'User' : 'Agent'}: ${msg.text}`)
+                .join('\n')
+
+              await updateCall(callIdRef.current, {
+                ended_at: endTime.toISOString(),
+                duration_seconds: durationSeconds,
+                status: 'dropped',
+                transcript: transcriptText || undefined,
+              })
+            } catch (err) {
+              console.error('Failed to update dropped call:', err)
+            }
+            callIdRef.current = null
+            callStartTimeRef.current = null
+          }
+          userEndedCallRef.current = false
           setStatus('Call ended')
           setIsCallActive(false)
           setAgentStatus('idle')
@@ -84,14 +132,46 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
   }, [agentId])
 
   const endConversation = useCallback(async () => {
+    // Mark that user intentionally ended the call (not dropped)
+    userEndedCallRef.current = true
+
+    // Save call data before ending
+    if (callIdRef.current && callStartTimeRef.current) {
+      try {
+        const endTime = new Date()
+        const durationSeconds = Math.round(
+          (endTime.getTime() - callStartTimeRef.current.getTime()) / 1000
+        )
+
+        // Format transcript for storage
+        const transcriptText = transcript
+          .map((msg) => `${msg.role === 'user' ? 'User' : 'Agent'}: ${msg.text}`)
+          .join('\n')
+
+        await updateCall(callIdRef.current, {
+          ended_at: endTime.toISOString(),
+          duration_seconds: durationSeconds,
+          status: 'completed',
+          transcript: transcriptText || undefined,
+        })
+      } catch (err) {
+        console.error('Failed to update call record:', err)
+      }
+    }
+
     if (conversationRef.current) {
       await conversationRef.current.endSession()
       conversationRef.current = null
     }
+
+    // Reset refs
+    callIdRef.current = null
+    callStartTimeRef.current = null
+
     setIsCallActive(false)
     setStatus('Ready')
     setAgentStatus('idle')
-  }, [])
+  }, [transcript])
 
   const toggleMute = useCallback(async () => {
     if (conversationRef.current) {

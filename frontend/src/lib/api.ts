@@ -48,6 +48,34 @@ export async function getCall(id: string): Promise<Call> {
   return fetchAPI<Call>(`/api/calls/${id}`)
 }
 
+export async function createCall(data: {
+  started_at: string
+  status?: string
+  caller_id?: string
+}): Promise<Call> {
+  return fetchAPI<Call>('/api/calls', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateCall(
+  id: string,
+  data: {
+    ended_at?: string
+    duration_seconds?: number
+    status?: string
+    transcript?: string
+    summary?: string
+    topics?: string
+  }
+): Promise<Call> {
+  return fetchAPI<Call>(`/api/calls/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  })
+}
+
 // Feedback API
 export async function submitFeedback(
   callId: string,

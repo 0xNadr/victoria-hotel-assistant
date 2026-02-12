@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { RatingStars } from '@/components/RatingStars'
-import { getCall, submitFeedback, updateFeedback } from '@/lib/api'
+import { getCall, submitFeedback, updateFeedback, updateCall } from '@/lib/api'
 import { formatDuration, formatDate, formatTime } from '@/lib/utils'
 import type { Call } from '@/types'
 import {
@@ -16,6 +16,9 @@ import {
   User,
   MessageSquare,
   Tag,
+  X,
+  Plus,
+  FileText,
 } from 'lucide-react'
 
 export default function CallDetailPage() {
@@ -27,6 +30,11 @@ export default function CallDetailPage() {
   const [comment, setComment] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [feedbackSuccess, setFeedbackSuccess] = useState(false)
+  const [tags, setTags] = useState<string[]>([])
+  const [newTag, setNewTag] = useState('')
+  const [savingTags, setSavingTags] = useState(false)
+  const [summary, setSummary] = useState('')
+  const [savingSummary, setSavingSummary] = useState(false)
 
   useEffect(() => {
     async function fetchCall() {
@@ -37,6 +45,10 @@ export default function CallDetailPage() {
           setRating(data.feedback.rating)
           setComment(data.feedback.comment ?? '')
         }
+        if (data.topics) {
+          setTags(data.topics.split(',').map((t) => t.trim()).filter(Boolean))
+        }
+        setSummary(data.summary ?? '')
       } catch (error) {
         console.error('Failed to fetch call:', error)
       } finally {
@@ -71,6 +83,52 @@ export default function CallDetailPage() {
       console.error('Failed to submit feedback:', error)
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleAddTag = async () => {
+    if (!call || !newTag.trim()) return
+    const tagToAdd = newTag.trim().toLowerCase()
+    if (tags.includes(tagToAdd)) {
+      setNewTag('')
+      return
+    }
+
+    const updatedTags = [...tags, tagToAdd]
+    setTags(updatedTags)
+    setNewTag('')
+    await saveTags(updatedTags)
+  }
+
+  const handleRemoveTag = async (tagToRemove: string) => {
+    if (!call) return
+    const updatedTags = tags.filter((t) => t !== tagToRemove)
+    setTags(updatedTags)
+    await saveTags(updatedTags)
+  }
+
+  const saveTags = async (updatedTags: string[]) => {
+    if (!call) return
+    setSavingTags(true)
+    try {
+      await updateCall(call.id, { topics: updatedTags.join(',') })
+    } catch (error) {
+      console.error('Failed to save tags:', error)
+    } finally {
+      setSavingTags(false)
+    }
+  }
+
+  const handleSaveSummary = async () => {
+    if (!call) return
+    setSavingSummary(true)
+    try {
+      await updateCall(call.id, { summary: summary || undefined })
+      setCall({ ...call, summary: summary || null })
+    } catch (error) {
+      console.error('Failed to save summary:', error)
+    } finally {
+      setSavingSummary(false)
     }
   }
 
@@ -257,39 +315,83 @@ export default function CallDetailPage() {
           </Card>
 
           {/* Summary */}
-          {call.summary && (
-            <Card>
-              <CardHeader className="px-4 sm:px-5 py-3">
-                <CardTitle>Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-5 py-4">
-                <p className="text-sm text-slate-600">{call.summary}</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Topics */}
-          {call.topics && (
-            <Card>
-              <CardHeader className="px-4 sm:px-5 py-3">
-                <CardTitle className="flex items-center gap-2">
-                  <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <Tag className="h-3.5 w-3.5 text-slate-600" />
-                  </div>
-                  Topics
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 sm:px-5 py-4">
-                <div className="flex flex-wrap gap-2">
-                  {call.topics.split(',').map((topic) => (
-                    <Badge key={topic} variant="default">
-                      {topic.trim()}
-                    </Badge>
-                  ))}
+          <Card>
+            <CardHeader className="px-4 sm:px-5 py-3">
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <FileText className="h-3.5 w-3.5 text-slate-600" />
                 </div>
-              </CardContent>
-            </Card>
-          )}
+                Summary
+                {savingSummary && (
+                  <span className="text-xs text-slate-400 font-normal">Saving...</span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-5 py-4">
+              <textarea
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                onBlur={handleSaveSummary}
+                placeholder="Add a summary..."
+                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 resize-none"
+                rows={3}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Tags */}
+          <Card>
+            <CardHeader className="px-4 sm:px-5 py-3">
+              <CardTitle className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center">
+                  <Tag className="h-3.5 w-3.5 text-slate-600" />
+                </div>
+                Tags
+                {savingTags && (
+                  <span className="text-xs text-slate-400 font-normal">Saving...</span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 sm:px-5 py-4">
+              <div className="flex flex-wrap gap-2 mb-3">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 text-sm text-slate-700"
+                  >
+                    {tag}
+                    <button
+                      onClick={() => handleRemoveTag(tag)}
+                      className="ml-0.5 hover:text-slate-900 text-slate-400"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+                {tags.length === 0 && (
+                  <span className="text-sm text-slate-400">No tags yet</span>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
+                  placeholder="Add a tag..."
+                  className="flex-1 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300"
+                />
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleAddTag}
+                  disabled={!newTag.trim()}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
