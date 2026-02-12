@@ -13,9 +13,9 @@ import {
 } from 'lucide-react'
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard, description: 'Overview & test agent' },
-  { name: 'Call Logs', href: '/calls', icon: Phone, description: 'Review conversations' },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3, description: 'Performance metrics' },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Call Logs', href: '/calls', icon: Phone },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 ]
 
 interface SidebarProps {
@@ -27,31 +27,30 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
 
   const handleNavClick = () => {
-    // Close sidebar on mobile when navigating
     if (onClose) {
       onClose()
     }
   }
 
   return (
-    <div className="flex h-full w-64 flex-col bg-gradient-to-b from-dormero-dark to-[#141414]">
+    <div className="flex h-full w-64 flex-col bg-white/70 backdrop-blur-xl border-r border-gray-200/60">
       {/* Logo */}
-      <div className="flex h-16 sm:h-20 items-center justify-between gap-3 px-4 sm:px-6 border-b border-white/5">
+      <div className="flex h-16 sm:h-[72px] items-center justify-between gap-3 px-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
-          <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-dormero-red to-red-700 shadow-lg shadow-dormero-red/20">
-            <Headphones className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
-            <div className="absolute -top-1 -right-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-green-500 border-2 border-dormero-dark animate-pulse" />
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900">
+            <Headphones className="h-4 w-4 text-white" />
+            <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" />
           </div>
           <div>
-            <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">Viktoria</h1>
-            <p className="text-xs text-gray-500 font-medium">Control Center</p>
+            <h1 className="text-base font-semibold text-slate-900 tracking-tight">Viktoria</h1>
+            <p className="text-xs text-slate-500">Control Center</p>
           </div>
         </div>
         {/* Close button - only visible on mobile */}
         {onClose && (
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="lg:hidden p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
@@ -59,10 +58,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 sm:py-6 space-y-1 overflow-y-auto">
-        <p className="px-3 mb-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          Menu
-        </p>
+      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
         {navigation.map((item) => {
           const isActive = pathname === item.href ||
             (item.href !== '/' && pathname.startsWith(item.href))
@@ -73,55 +69,44 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               href={item.href}
               onClick={handleNavClick}
               className={cn(
-                'group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200',
+                'group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
                 isActive
-                  ? 'bg-dormero-red text-white shadow-lg shadow-dormero-red/25'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  ? 'bg-slate-900 text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
               )}
             >
-              <div
-                className={cn(
-                  'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
-                  isActive
-                    ? 'bg-white/20'
-                    : 'bg-white/5 group-hover:bg-white/10'
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-              </div>
-              <div className="flex flex-col">
-                <span>{item.name}</span>
-                {!isActive && (
-                  <span className="text-xs text-gray-600 group-hover:text-gray-500">
-                    {item.description}
-                  </span>
-                )}
-              </div>
+              <item.icon className={cn(
+                'h-[18px] w-[18px]',
+                isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
+              )} />
+              <span>{item.name}</span>
             </Link>
           )
         })}
       </nav>
 
       {/* AI Badge */}
-      <div className="px-3 sm:px-4 py-3">
-        <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-dormero-red/10 to-purple-500/10 px-3 sm:px-4 py-2.5 sm:py-3 border border-white/5">
-          <Sparkles className="h-4 w-4 text-dormero-red" />
+      <div className="px-4 py-3">
+        <div className="flex items-center gap-2.5 rounded-lg bg-slate-50 px-3 py-2.5 border border-slate-100">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
+          </div>
           <div>
-            <p className="text-xs font-medium text-white">AI Powered</p>
-            <p className="text-xs text-gray-500">ElevenLabs Voice</p>
+            <p className="text-xs font-medium text-slate-700">AI Powered</p>
+            <p className="text-[11px] text-slate-400">ElevenLabs Voice</p>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <div className="border-t border-white/5 p-3 sm:p-4">
-        <div className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5 cursor-pointer transition-colors">
-          <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center ring-2 ring-white/10">
-            <span className="text-xs sm:text-sm font-semibold text-white">D</span>
+      <div className="border-t border-gray-100 p-4">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
+            <span className="text-xs font-medium text-slate-600">D</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Dormero Hotels</p>
-            <p className="text-xs text-gray-500">Support Team</p>
+            <p className="text-sm font-medium text-slate-800 truncate">Dormero Hotels</p>
+            <p className="text-xs text-slate-400">Support Team</p>
           </div>
         </div>
       </div>

@@ -3,11 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 249, 250, 251;
-  --dormero-red: #C41230;
-  --dormero-red-light: #dc2f4a;
-  --dormero-dark: #1a1a1a;
+  --foreground-rgb: 15, 23, 42;
+  --background-rgb: 250, 250, 250;
+
+  /* Clar AI inspired color palette */
+  --clar-primary: #10b981;
+  --clar-primary-light: #34d399;
+  --clar-accent: #8b5cf6;
+  --clar-dark: #0f172a;
+  --clar-muted: #64748b;
+
+  /* Frosted glass */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 body {
@@ -15,9 +23,10 @@ body {
   background: rgb(var(--background-rgb));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Smooth transitions globally */
+/* Subtle transitions globally */
 *, *::before, *::after {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -29,50 +38,44 @@ body {
   transition: none;
 }
 
-/* Custom scrollbar */
+/* Refined scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: #e2e8f0;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #cbd5e1;
 }
 
-/* Focus styles for accessibility */
+/* Subtle focus styles */
 :focus-visible {
-  outline: 2px solid var(--dormero-red);
+  outline: 2px solid var(--clar-primary);
   outline-offset: 2px;
 }
 
 /* Selection styling */
 ::selection {
-  background-color: rgba(196, 18, 48, 0.15);
+  background-color: rgba(16, 185, 129, 0.15);
   color: inherit;
 }
 
-/* Table row hover animation */
-tr {
-  transition: background-color 150ms ease;
-}
-
-/* Button hover lift effect */
+/* Remove button hover lift - too flashy */
 button:not(:disabled):hover {
-  transform: translateY(-1px);
+  transform: none;
 }
 
 button:not(:disabled):active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 /* Link underline animation */
@@ -80,8 +83,24 @@ a {
   text-decoration-skip-ink: auto;
 }
 
-/* Page content fade-in */
+/* Subtle page content fade-in */
 @keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-content {
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Subtle card entrance animation */
+@keyframes slideUp {
   from {
     opacity: 0;
     transform: translateY(8px);
@@ -92,48 +111,37 @@ a {
   }
 }
 
-.page-content {
-  animation: fadeIn 0.3s ease-out;
-}
-
-/* Subtle card entrance animation */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* Staggered card animations */
 .card-animate {
-  animation: slideUp 0.4s ease-out backwards;
+  animation: slideUp 0.3s ease-out backwards;
 }
 
 .card-animate:nth-child(1) { animation-delay: 0ms; }
-.card-animate:nth-child(2) { animation-delay: 50ms; }
-.card-animate:nth-child(3) { animation-delay: 100ms; }
-.card-animate:nth-child(4) { animation-delay: 150ms; }
+.card-animate:nth-child(2) { animation-delay: 40ms; }
+.card-animate:nth-child(3) { animation-delay: 80ms; }
+.card-animate:nth-child(4) { animation-delay: 120ms; }
 
-/* Gradient text utility */
-.text-gradient {
-  background: linear-gradient(135deg, var(--dormero-red) 0%, var(--dormero-red-light) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Frosted glass utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-/* Soft glow effect for active elements */
-.glow-red {
-  box-shadow: 0 0 20px rgba(196, 18, 48, 0.3);
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Inset shadow for depth without heaviness */
+.shadow-inset {
+  box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.8);
 }
 
 /* Better input focus states */
 input:focus, select:focus, textarea:focus {
-  box-shadow: 0 0 0 3px rgba(196, 18, 48, 0.1);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 /* Mobile sidebar slide-in animation */
@@ -147,27 +155,31 @@ input:focus, select:focus, textarea:focus {
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.25s ease-out;
+  animation: slideInRight 0.2s ease-out;
+}
+
+/* Status ping animation - subtle */
+@keyframes ping-subtle {
+  75%, 100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-ping-subtle {
+  animation: ping-subtle 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 /* Mobile-specific styles */
 @media (max-width: 1023px) {
-  /* Reduce padding on mobile */
   .page-content {
     padding: 1rem !important;
   }
 
-  /* Better touch targets on mobile */
   button, a {
     min-height: 44px;
   }
 
-  /* Disable hover lift on touch devices */
-  button:not(:disabled):hover {
-    transform: none;
-  }
-
-  /* Smaller scrollbar on mobile */
   ::-webkit-scrollbar {
     width: 4px;
     height: 4px;

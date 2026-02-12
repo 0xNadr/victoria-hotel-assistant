@@ -13,7 +13,7 @@ interface AgentWidgetProps {
 export function AgentWidget({ agentId }: AgentWidgetProps) {
   const [isCallActive, setIsCallActive] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
-  const [status, setStatus] = useState<string>('Ready to call')
+  const [status, setStatus] = useState<string>('Ready')
   const [agentStatus, setAgentStatus] = useState<'listening' | 'speaking' | 'idle'>('idle')
   const [transcript, setTranscript] = useState<Array<{ role: string; text: string; isTentative?: boolean }>>([])
   const [tentativeUserText, setTentativeUserText] = useState<string | null>(null)
@@ -22,7 +22,7 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
 
   const startConversation = useCallback(async () => {
     try {
-      setStatus('Connecting to Viktoria...')
+      setStatus('Connecting...')
       setTranscript([])
 
       const conversation = await Conversation.startSession({
@@ -41,7 +41,6 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
         onMessage: (message) => {
           const msg = message as any
           if (msg.message) {
-            // Clear tentative text when final user message arrives
             if (msg.source === 'user') {
               setTentativeUserText(null)
             }
@@ -53,13 +52,11 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
         },
         onModeChange: (mode) => {
           setAgentStatus(mode.mode === 'speaking' ? 'speaking' : 'listening')
-          // Clear tentative text when agent starts speaking
           if (mode.mode === 'speaking') {
             setTentativeUserText(null)
           }
         },
         onDebug: (debugEvent) => {
-          // Capture tentative user transcriptions for immediate display
           const event = debugEvent as any
           if (event?.type === 'tentative_user_transcript') {
             const text = event?.tentative_user_transcription_event?.user_transcript
@@ -70,7 +67,7 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
         },
         onError: (error) => {
           console.error('Conversation error:', error)
-          setStatus('Connection error')
+          setStatus('Error')
           setIsCallActive(false)
         },
       })
@@ -79,9 +76,9 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
     } catch (error: any) {
       console.error('Failed to start conversation:', error)
       if (error.name === 'NotAllowedError') {
-        setStatus('Microphone access denied')
+        setStatus('Mic denied')
       } else {
-        setStatus('Failed to connect')
+        setStatus('Failed')
       }
     }
   }, [agentId])
@@ -92,7 +89,7 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
       conversationRef.current = null
     }
     setIsCallActive(false)
-    setStatus('Ready to call')
+    setStatus('Ready')
     setAgentStatus('idle')
   }, [])
 
@@ -104,14 +101,12 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
     }
   }, [isMuted])
 
-  // Auto-scroll transcript
   useEffect(() => {
     if (transcriptRef.current) {
       transcriptRef.current.scrollTop = transcriptRef.current.scrollHeight
     }
   }, [transcript, tentativeUserText])
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (conversationRef.current) {
@@ -122,124 +117,114 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
 
   return (
     <Card className="h-full flex flex-col overflow-hidden" hover={false}>
-      <CardHeader className="flex flex-row items-center justify-between pb-3 px-3 sm:px-6 py-3 sm:py-5 bg-gradient-to-r from-gray-50 to-white">
-        <CardTitle className="flex items-center gap-2 sm:gap-3">
+      <CardHeader className="flex flex-row items-center justify-between py-3 px-4 bg-slate-50/50">
+        <CardTitle className="flex items-center gap-2.5">
           <div className="relative">
             <div
-              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all ${
-                isCallActive
-                  ? 'bg-gradient-to-br from-dormero-red to-red-600 shadow-lg shadow-red-500/30'
-                  : 'bg-gray-100'
+              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                isCallActive ? 'bg-slate-900' : 'bg-slate-200'
               }`}
             >
-              <Bot className={`h-4 w-4 sm:h-5 sm:w-5 ${isCallActive ? 'text-white' : 'text-gray-400'}`} />
+              <Bot className={`h-4 w-4 ${isCallActive ? 'text-white' : 'text-slate-500'}`} />
             </div>
             <div
-              className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border-2 border-white transition-colors ${
+              className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white transition-colors ${
                 isCallActive
                   ? agentStatus === 'speaking'
-                    ? 'bg-dormero-red animate-pulse'
-                    : 'bg-green-500 animate-pulse'
-                  : 'bg-gray-300'
+                    ? 'bg-violet-500'
+                    : 'bg-emerald-500'
+                  : 'bg-slate-300'
               }`}
             />
           </div>
           <div>
-            <span className="block text-sm sm:text-base">Test Viktoria</span>
-            <span className="text-xs text-gray-500 font-normal">Voice Agent</span>
+            <span className="block text-sm font-medium text-slate-900">Test Agent</span>
+            <span className="text-xs text-slate-500">Voice Assistant</span>
           </div>
         </CardTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           {isCallActive && agentStatus === 'speaking' && (
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-red-100 text-dormero-red">
-              <Waves className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-pulse" />
-              <span className="text-xs font-medium hidden sm:inline">Speaking</span>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-violet-50 text-violet-700">
+              <Waves className="h-3 w-3" />
+              <span className="text-xs font-medium">Speaking</span>
             </div>
           )}
           {isCallActive && agentStatus === 'listening' && (
-            <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-green-100 text-green-700">
-              <Mic className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-pulse" />
-              <span className="text-xs font-medium hidden sm:inline">Listening</span>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-50 text-emerald-700">
+              <Mic className="h-3 w-3" />
+              <span className="text-xs font-medium">Listening</span>
             </div>
           )}
           {!isCallActive && (
-            <span className="text-xs text-gray-400 px-2 py-0.5 sm:py-1 rounded-full bg-gray-100 max-w-[100px] sm:max-w-none truncate">{status}</span>
+            <span className="text-xs text-slate-400 px-2 py-1 rounded bg-slate-100">{status}</span>
           )}
         </div>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-3 sm:gap-4 p-3 sm:p-4">
+      <CardContent className="flex-1 flex flex-col gap-3 p-4">
         {/* Transcript Area */}
         <div
           ref={transcriptRef}
-          className="flex-1 bg-gradient-to-b from-gray-50 to-gray-100/50 rounded-lg sm:rounded-xl p-3 sm:p-4 min-h-[200px] sm:min-h-[250px] max-h-[280px] sm:max-h-[350px] overflow-y-auto border border-gray-100"
+          className="flex-1 bg-slate-50 rounded-lg p-3 min-h-[200px] max-h-[300px] overflow-y-auto border border-slate-100"
         >
           {transcript.length === 0 && !tentativeUserText ? (
-            <div className="h-full flex flex-col items-center justify-center text-center px-2 sm:px-4">
-              <div className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-5 ${
+            <div className="h-full flex flex-col items-center justify-center text-center px-4">
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4 ${
                 isCallActive
-                  ? 'bg-gradient-to-br from-green-500 to-emerald-600 shadow-xl shadow-green-500/30'
-                  : 'bg-gradient-to-br from-dormero-red/10 to-red-100'
+                  ? 'bg-emerald-100'
+                  : 'bg-slate-100'
               }`}>
-                <Phone className={`h-7 w-7 sm:h-9 sm:w-9 ${isCallActive ? 'text-white' : 'text-dormero-red'}`} />
-                {isCallActive && (
-                  <div className="absolute inset-0 rounded-xl sm:rounded-2xl animate-ping bg-green-500/20" />
-                )}
+                <Phone className={`h-6 w-6 ${isCallActive ? 'text-emerald-600' : 'text-slate-400'}`} />
               </div>
-              <p className="text-gray-700 font-medium text-sm sm:text-base">
-                {isCallActive
-                  ? 'Listening...'
-                  : 'Test the Voice Agent'}
+              <p className="text-sm font-medium text-slate-700">
+                {isCallActive ? 'Listening...' : 'Test the Voice Agent'}
               </p>
-              <p className="text-gray-400 text-xs sm:text-sm mt-1.5 sm:mt-2 max-w-[180px] sm:max-w-[200px]">
+              <p className="text-xs text-slate-400 mt-1.5 max-w-[180px]">
                 {isCallActive
-                  ? 'Start speaking to Viktoria!'
-                  : 'Click "Start Call" to begin a conversation'}
+                  ? 'Start speaking to the agent'
+                  : 'Click Start Call to begin'}
               </p>
               {!isCallActive && (
-                <div className="flex items-center gap-1.5 sm:gap-2 mt-3 sm:mt-4 text-xs text-gray-400">
-                  <Mic className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                  <span>Microphone access required</span>
+                <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-400">
+                  <Mic className="h-3 w-3" />
+                  <span>Microphone required</span>
                 </div>
               )}
             </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-3">
               {transcript.map((msg, i) => (
                 <div
                   key={i}
-                  className={`flex gap-2 sm:gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                  className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   <div
-                    className={`flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg flex items-center justify-center ${
-                      msg.role === 'user'
-                        ? 'bg-blue-100'
-                        : 'bg-gradient-to-br from-dormero-red to-red-600'
+                    className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center ${
+                      msg.role === 'user' ? 'bg-slate-200' : 'bg-slate-900'
                     }`}
                   >
                     {msg.role === 'user' ? (
-                      <User className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                      <User className="h-3 w-3 text-slate-600" />
                     ) : (
-                      <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+                      <Bot className="h-3 w-3 text-white" />
                     )}
                   </div>
                   <div
-                    className={`max-w-[80%] sm:max-w-[75%] rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm shadow-sm ${
+                    className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
                       msg.role === 'user'
-                        ? 'bg-blue-500 text-white rounded-tr-sm sm:rounded-tr-md'
-                        : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm sm:rounded-tl-md'
+                        ? 'bg-slate-200 text-slate-800'
+                        : 'bg-white text-slate-700 border border-slate-200'
                     }`}
                   >
                     {msg.text}
                   </div>
                 </div>
               ))}
-              {/* Show tentative user input as they speak */}
               {tentativeUserText && (
-                <div className="flex gap-2 sm:gap-3 flex-row-reverse">
-                  <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-md sm:rounded-lg flex items-center justify-center bg-blue-100">
-                    <User className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600" />
+                <div className="flex gap-2 flex-row-reverse">
+                  <div className="flex-shrink-0 w-6 h-6 rounded flex items-center justify-center bg-slate-200">
+                    <User className="h-3 w-3 text-slate-600" />
                   </div>
-                  <div className="max-w-[80%] sm:max-w-[75%] rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm shadow-sm bg-blue-400 text-white rounded-tr-sm sm:rounded-tr-md opacity-70 italic">
+                  <div className="max-w-[80%] rounded-lg px-3 py-2 text-sm bg-slate-100 text-slate-500 italic">
                     {tentativeUserText}...
                   </div>
                 </div>
@@ -249,15 +234,11 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-2 sm:gap-3 pt-1 sm:pt-2">
+        <div className="flex items-center justify-center gap-2 pt-1">
           {!isCallActive ? (
-            <Button
-              onClick={startConversation}
-              className="gap-2 sm:gap-2.5 px-6 sm:px-8 shadow-lg shadow-dormero-red/25 hover:shadow-xl hover:shadow-dormero-red/30"
-              size="lg"
-            >
-              <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="text-sm sm:text-base">Start Call</span>
+            <Button onClick={startConversation} size="lg" className="gap-2">
+              <Phone className="h-4 w-4" />
+              Start Call
             </Button>
           ) : (
             <>
@@ -265,19 +246,19 @@ export function AgentWidget({ agentId }: AgentWidgetProps) {
                 onClick={toggleMute}
                 variant="secondary"
                 size="lg"
-                className={`gap-1.5 sm:gap-2 px-3 sm:px-4 ${isMuted ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : ''}`}
+                className={`gap-1.5 ${isMuted ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : ''}`}
               >
-                {isMuted ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />}
-                <span className="text-sm sm:text-base">{isMuted ? 'Unmute' : 'Mute'}</span>
+                {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {isMuted ? 'Unmute' : 'Mute'}
               </Button>
               <Button
                 onClick={endConversation}
                 variant="secondary"
                 size="lg"
-                className="gap-1.5 sm:gap-2 px-3 sm:px-4 bg-red-100 text-red-700 hover:bg-red-200 shadow-md shadow-red-500/10"
+                className="gap-1.5 bg-red-50 text-red-700 hover:bg-red-100"
               >
-                <PhoneOff className="h-4 w-4 sm:h-5 sm:w-5" />
-                <span className="text-sm sm:text-base">End Call</span>
+                <PhoneOff className="h-4 w-4" />
+                End
               </Button>
             </>
           )}

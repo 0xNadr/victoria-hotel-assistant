@@ -31,28 +31,28 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
   }, [sidebarOpen])
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-[#fafafa]">
       {/* Desktop Sidebar - hidden on mobile */}
       <div className="hidden lg:block">
         <Sidebar />
       </div>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-dormero-dark border-b border-white/10">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/60">
         <div className="flex items-center justify-between h-14 px-4">
           <div className="flex items-center gap-3">
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-dormero-red to-red-700">
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900">
               <Headphones className="h-4 w-4 text-white" />
-              <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-green-500 border border-dormero-dark animate-pulse" />
+              <div className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 border-[1.5px] border-white" />
             </div>
-            <span className="text-white font-semibold">Viktoria</span>
+            <span className="text-slate-900 font-semibold">Viktoria</span>
           </div>
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors"
             aria-label="Open menu"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
           </button>
         </div>
       </div>
@@ -60,11 +60,11 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-50 bg-slate-900/20 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         >
           <div
-            className="absolute right-0 top-0 h-full w-64 animate-slide-in-right"
+            className="absolute right-0 top-0 h-full w-64 animate-slide-in-right shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
