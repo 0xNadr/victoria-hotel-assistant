@@ -1,0 +1,52 @@
+services:
+  victoria-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: victoria-api
+    container_name: victoria-api
+    restart: unless-stopped
+    mem_limit: 512m
+    env_file:
+      - ./backend/.env
+    volumes:
+      - victoria_db:/app
+      - victoria_chroma:/app/chroma_data
+      - victoria_onnx:/root/.cache/chroma
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+    networks:
+      - proxy
+
+  victoria-web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://victoria-api.nader.info
+        NEXT_PUBLIC_ELEVENLABS_AGENT_ID: agent_5801kh6ecsx3e0qbh6y6wt4bfsbk
+    image: victoria-web
+    container_name: victoria-web
+    restart: unless-stopped
+    mem_limit: 512m
+    expose:
+      - "3000"
+    depends_on:
+      - victoria-api
+    networks:
+      - proxy
+
+volumes:
+  victoria_db:
+  victoria_chroma:
+  victoria_onnx:
+
+networks:
+  proxy:
+    external: true
